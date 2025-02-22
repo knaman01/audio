@@ -141,9 +141,11 @@ class ChordAnalysis: ObservableObject {
         isAnalyzing = true
         detectedNotes.removeAll()
         
-        let tracker = PitchTap(player) { pitch, _ in
+        let tracker = PitchTap(player) { pitch, amplitude in
             DispatchQueue.main.async {
-                self.processPitch(pitch)
+                // Debug print to see both values separately
+                // print("Frequency: \(pitch[0]) Hz, Amplitude: \(amplitude[0])")
+                self.processPitch([pitch[0], amplitude[0]])  // Pass both actual values
             }
         }
         
@@ -164,7 +166,6 @@ class ChordAnalysis: ObservableObject {
     }
     
     private func processPitch(_ pitch: [Float]) {
-        // Rate limit to process only every 100ms
         let now = Date()
         guard now.timeIntervalSince(lastProcessTime) > 0.1 else { return }
         lastProcessTime = now
@@ -173,43 +174,68 @@ class ChordAnalysis: ObservableObject {
               pitch.count >= 2 else { return }
         
         let amplitude = pitch[1]
-
-        // print (amplitude)
-        let noiseThreshold: Float = 100
+        let noiseThreshold: Float = 0.02
         
         if amplitude > noiseThreshold {
             let note = frequencyToNoteName(freq)
+            let noteWithoutOctave = String(note.prefix(while: { !$0.isNumber }))
             
-            // Increment note count in buffer
-            noteBuffer[note, default: 0] += 1
+            // Increment the note count
+            noteBuffer[noteWithoutOctave, default: 0] += 1
             
-            // Only add notes that have been detected multiple times
-            if noteBuffer[note, default: 0] >= 3 && !detectedNotes.contains(note) {
-                detectedNotes.append(note)
+            // Add to detected notes if it appears enough times
+            if noteBuffer[noteWithoutOctave, default: 0] >= 2 && !detectedNotes.contains(noteWithoutOctave) {
+                detectedNotes.append(noteWithoutOctave)
+                print("Detected note: \(noteWithoutOctave) (freq: \(freq)Hz, count: \(noteBuffer[noteWithoutOctave, default: 0]))")
             }
         }
     }
     
     private func frequencyToNoteName(_ frequency: Float) -> String {
+
+        // A4 = 440Hz, which is 69 semitones above C0
         let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        let noteNumber = round(12 * log2(Double(frequency) / 440.0) + 69)
-        let noteIndex = Int(noteNumber) % 12
-        return noteNames[noteIndex]
+        
+        // Use the formula: n = 12 * log2(f/440) + 69
+        // This gives us the MIDI note number
+        let midiNoteNumber = 12.0 * log2(Double(frequency) / 440.0) + 69.0
+        
+        // Round to nearest note
+        let roundedNote = Int(round(midiNoteNumber))
+        
+        // Get the note name (0-11)
+        let noteIndex = ((roundedNote % 12) + 12) % 12
+        
+        // Add octave number for debugging
+        let octave = (roundedNote / 12) - 1
+        return "\(noteNames[noteIndex])\(octave)"  // Including octave number temporarily
     }
     
     private func identifyChord(from notes: [String]) -> String {
-        let knownChords: [String: Set<String>] = [
-            "C Major": ["C", "E", "G"],
-            "G Major": ["G", "B", "D"],
-            "D Major": ["D", "F#", "A"],
-            "A Minor": ["A", "C", "E"]
+        print("Notes with counts:", noteBuffer)  // Debug log to see note frequencies
+        
+        // Filter out notes that don't appear frequently enough
+        let significantNotes = noteBuffer.filter { $0.value >= 5 }  // Increased threshold
+            .map { $0.key }
+        
+        print("Significant notes:", significantNotes)  // Debug log
+        
+        let knownChords: [String: (root: String, notes: Set<String>)] = [
+            "C Major": ("C", ["C", "E", "G"]),
+            "G Major": ("G", ["G", "B", "D"]),
+            "D Major": ("D", ["D", "F#", "A"]),
+            "A Minor": ("A", ["A", "C", "E"])
         ]
         
-        for (chord, chordNotes) in knownChords {
-            if chordNotes.isSubset(of: Set(notes)) {
-                return chord
+        for (chord, details) in knownChords {
+            // Check if the root note is present and prominent
+            guard significantNotes.contains(details.root),
+                  details.notes.isSubset(of: Set(significantNotes)) else {
+                continue
             }
+            return chord
         }
+        
         return "Unknown Chord"
     }
 }
