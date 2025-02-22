@@ -26,6 +26,9 @@ class ChordAnalysis: ObservableObject {
     @Published var detectedChord: String = "Press Analyze"
     @Published var recordedFileURL: URL?
     
+    private var lastProcessTime: Date = Date()
+    private var noteBuffer: [String: Int] = [:]  // Track note occurrences
+    
     private func loadRecordedFile() {
         guard let fileURL = recordedFileURL else { return }
         
@@ -57,10 +60,22 @@ class ChordAnalysis: ObservableObject {
             let samplingRate = max(frameLength / 100, 1)
             var samples: [Float] = []
             
+            // Add noise threshold
+            let noiseThreshold: Float = 0.01  // Adjust this value as needed
+            
             for i in stride(from: 0, to: frameLength, by: samplingRate) {
                 let sample = abs(floatData[i])
-                samples.append(sample)
+                
+                
+                // Only add samples that are above the noise threshold
+                if sample > noiseThreshold {
+                    samples.append(sample)
+                } else {
+                    samples.append(0)  // Set noise to zero
+                }
             }
+            
+
             
             // Normalize samples to range 0...1
             if let maxSample = samples.max(), maxSample > 0 {
@@ -137,7 +152,7 @@ class ChordAnalysis: ObservableObject {
             tracker.start()
             player.play()
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
                 tracker.stop()
                 self.engine.stop()
                 self.detectedChord = self.identifyChord(from: self.detectedNotes)
@@ -149,12 +164,29 @@ class ChordAnalysis: ObservableObject {
     }
     
     private func processPitch(_ pitch: [Float]) {
-        guard let freq = pitch.first, freq > 0 else { return }
+        // Rate limit to process only every 100ms
+        let now = Date()
+        guard now.timeIntervalSince(lastProcessTime) > 0.1 else { return }
+        lastProcessTime = now
         
-        let note = frequencyToNoteName(freq)
+        guard let freq = pitch.first, freq > 0,
+              pitch.count >= 2 else { return }
         
-        if !detectedNotes.contains(note) {
-            detectedNotes.append(note)
+        let amplitude = pitch[1]
+
+        // print (amplitude)
+        let noiseThreshold: Float = 100
+        
+        if amplitude > noiseThreshold {
+            let note = frequencyToNoteName(freq)
+            
+            // Increment note count in buffer
+            noteBuffer[note, default: 0] += 1
+            
+            // Only add notes that have been detected multiple times
+            if noteBuffer[note, default: 0] >= 3 && !detectedNotes.contains(note) {
+                detectedNotes.append(note)
+            }
         }
     }
     

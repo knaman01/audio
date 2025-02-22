@@ -16,8 +16,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "5"
             endingLineNumber = "5"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            landmarkName = "WaveformView"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -48,38 +48,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "45"
             endingLineNumber = "45"
-            landmarkName = "processWaveform(_:)"
+            landmarkName = "loadRecordedFile()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "5E2EDB68-C728-4216-8E4D-0AB7591AD0A8 - 4142380742d484"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "test11.ChordAnalysis.startRecording() -&gt; ()"
-                  moduleName = "test11.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/naman.kalkhuria/Desktop/test11/test11/ChordAnalysis.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "45"
-                  endingLineNumber = "45">
-               </Location>
-               <Location
-                  uuid = "5E2EDB68-C728-4216-8E4D-0AB7591AD0A8 - d32f5ec5fe0aa4c9"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "test11.ChordAnalysis.processWaveform(__C.AVAudioFile) -&gt; ()"
-                  moduleName = "test11.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/naman.kalkhuria/Desktop/test11/test11/ChordAnalysis.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "45"
-                  endingLineNumber = "45">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
