@@ -52,28 +52,20 @@ struct ContentView: View {
                 .font(.title)
                 .padding()
             
-            if chordAnalysis.isAnalyzing {
-                ProgressView()
-            }
-            
-            HStack {
-                Button(action: {
-                    if chordAnalysis.isRecording {
-                        chordAnalysis.stopRecording()
-                    } else {
-                        chordAnalysis.startRecording()
-                    }
-                }) {
-                    Text(chordAnalysis.isRecording ? "Stop Recording" : "Start Recording")
+            Button(action: {
+                if chordAnalysis.isRecording {
+                    chordAnalysis.stopRecording()
+                } else {
+                    chordAnalysis.startRecording()
                 }
-                .padding()
-                
-                Button("Analyze") {
-                    chordAnalysis.analyzeRecording()
-                }
-                .padding()
-                .disabled(chordAnalysis.isRecording || !chordAnalysis.isWaveformReady)
+            }) {
+                Text(chordAnalysis.isRecording ? "Stop Recording" : "Start Recording")
+                    .padding()
+                    .background(chordAnalysis.isRecording ? Color.red : Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
             }
+            .padding()
             
             if !chordAnalysis.detectedNotes.isEmpty {
                 Text("Detected Notes: \(chordAnalysis.detectedNotes.joined(separator: ", "))")

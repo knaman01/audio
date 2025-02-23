@@ -23,11 +23,119 @@ class ChordAnalysis: ObservableObject {
     @Published var isAnalyzing = false
     @Published var isRecording = false
     @Published var detectedNotes: [String] = []
-    @Published var detectedChord: String = "Press Analyze"
+    @Published var detectedChord: String = "Press Record"
     @Published var recordedFileURL: URL?
     
     private var lastProcessTime: Date = Date()
     private var noteBuffer: [String: Int] = [:]  // Track note occurrences
+    
+    private var micMixer: Mixer?
+    private var pitchTap: PitchTap?
+    
+    init() {
+        setupAudioSession()
+        setupAudioEngine()
+    }
+    
+    private func setupAudioSession() {
+        do {
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .mixWithOthers])
+            try audioSession.setActive(true)
+        } catch {
+            print("Failed to set up audio session: \(error.localizedDescription)")
+        }
+    }
+    
+    private func setupAudioEngine() {
+        // Stop existing connections
+        pitchTap?.stop()
+        engine.stop()
+        
+        guard let input = engine.input else {
+            print("Audio input not available")
+            return
+        }
+        
+        // Create mixer and connect input
+        micMixer = Mixer(input)
+        engine.output = micMixer
+        micMixer?.volume = 0.0
+        
+        // Setup pitch tracking
+        pitchTap = PitchTap(input) { pitch, amplitude in
+            DispatchQueue.main.async {
+                self.processPitch([pitch[0], amplitude[0]])
+            }
+        }
+    }
+    
+    func startRecording() {
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("recording.m4a")
+        let settings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatMPEG4AAC,
+            AVSampleRateKey: 44100.0,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
+        
+        do {
+            audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
+            audioRecorder?.record()
+            
+            // Start real-time analysis
+            try engine.start()
+            pitchTap?.start()
+            
+            isRecording = true
+            recordedFileURL = fileURL
+            detectedNotes.removeAll()
+            detectedChord = "Recording..."
+        } catch {
+            print("Failed to start recording: \(error.localizedDescription)")
+        }
+    }
+    
+    func stopRecording() {
+        audioRecorder?.stop()
+        pitchTap?.stop()
+        engine.stop()
+        isRecording = false
+        
+        if detectedNotes.isEmpty {
+            detectedChord = "No notes detected"
+        }
+        
+        loadRecordedFile()
+    }
+    
+    private func processPitch(_ pitch: [Float]) {
+        let now = Date()
+        guard now.timeIntervalSince(lastProcessTime) > 0.1 else { return }
+        lastProcessTime = now
+        
+        guard let freq = pitch.first, freq > 0,
+              pitch.count >= 2 else { return }
+        
+        let amplitude = pitch[1]
+        let noiseThreshold: Float = 0.02
+        
+        if amplitude > noiseThreshold {
+            let note = frequencyToNoteName(freq)
+            let noteWithoutOctave = String(note.prefix(while: { !$0.isNumber }))
+            
+            // Add to detected notes if it's not already there
+            if !detectedNotes.contains(noteWithoutOctave) {
+                detectedNotes.append(noteWithoutOctave)
+                
+                // Update the detected chord text
+                if !detectedNotes.isEmpty {
+                    detectedChord = "Notes: \(detectedNotes.joined(separator: ", "))"
+                }
+                
+                print("Detected note: \(noteWithoutOctave) (freq: \(freq)Hz)")
+            }
+        }
+    }
     
     private func loadRecordedFile() {
         guard let fileURL = recordedFileURL else { return }
@@ -35,6 +143,9 @@ class ChordAnalysis: ObservableObject {
         do {
             let audioFile = try AVAudioFile(forReading: fileURL)
             audioPlayer = AudioPlayer(file: audioFile)
+            
+            // Reset the engine before setting up playback
+            engine.stop()
             engine.output = audioPlayer
             
             // Add waveform processing
@@ -91,105 +202,6 @@ class ChordAnalysis: ObservableObject {
             print("Error processing waveform: \(error.localizedDescription)")
         }
     }
-
-
-    init() {
-        setupAudioSession()
-    }
-    
-    private func setupAudioSession() {
-        do {
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: .defaultToSpeaker)
-            try audioSession.setActive(true)
-        } catch {
-            print("Failed to set up audio session: \(error.localizedDescription)")
-        }
-    }
-    
-    func startRecording() {
-        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("recording.m4a")
-        let settings: [String: Any] = [
-            AVFormatIDKey: kAudioFormatMPEG4AAC,
-            AVSampleRateKey: 44100.0,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ]
-        
-        do {
-            audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
-            audioRecorder?.record()
-            isRecording = true
-            recordedFileURL = fileURL
-        } catch {
-            print("Failed to start recording: \(error.localizedDescription)")
-        }
-    }
-    
-    func stopRecording() {
-        audioRecorder?.stop()
-        isRecording = false
-        loadRecordedFile()
-    }
-    
-
-    func analyzeRecording() {
-        guard let player = audioPlayer else {
-            print("Audio player not initialized.")
-            return
-        }
-        
-        isAnalyzing = true
-        detectedNotes.removeAll()
-        
-        let tracker = PitchTap(player) { pitch, amplitude in
-            DispatchQueue.main.async {
-                // Debug print to see both values separately
-                // print("Frequency: \(pitch[0]) Hz, Amplitude: \(amplitude[0])")
-                self.processPitch([pitch[0], amplitude[0]])  // Pass both actual values
-            }
-        }
-        
-        do {
-            try engine.start()
-            tracker.start()
-            player.play()
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-                tracker.stop()
-                self.engine.stop()
-                
-                self.isAnalyzing = false
-            }
-        } catch {
-            print("Audio engine start error: \(error.localizedDescription)")
-        }
-    }
-    
-    private func processPitch(_ pitch: [Float]) {
-        let now = Date()
-        guard now.timeIntervalSince(lastProcessTime) > 0.1 else { return }
-        lastProcessTime = now
-        
-        guard let freq = pitch.first, freq > 0,
-              pitch.count >= 2 else { return }
-        
-        let amplitude = pitch[1]
-        let noiseThreshold: Float = 0.02
-        
-        if amplitude > noiseThreshold {
-            let note = frequencyToNoteName(freq)
-            let noteWithoutOctave = String(note.prefix(while: { !$0.isNumber }))
-            
-            // // Increment the note count
-            // noteBuffer[noteWithoutOctave, default: 0] += 1
-            
-            // Add to detected notes if it appears enough times
-            if !detectedNotes.contains(noteWithoutOctave) {
-                detectedNotes.append(noteWithoutOctave)
-                print("Detected note: \(noteWithoutOctave) (freq: \(freq)Hz, count: \(noteBuffer[noteWithoutOctave, default: 0]))")
-            }
-        }
-    }
     
     private func frequencyToNoteName(_ frequency: Float) -> String {
 
@@ -209,5 +221,29 @@ class ChordAnalysis: ObservableObject {
         // Add octave number for debugging
         let octave = (roundedNote / 12) - 1
         return "\(noteNames[noteIndex])\(octave)"  // Including octave number temporarily
+    }
+    
+    func analyzeRecording() {
+        // This method can be removed or kept for analyzing recorded audio
+        // Since we're now doing real-time analysis
+        guard let player = audioPlayer else {
+            print("Audio player not initialized.")
+            return
+        }
+        
+        isAnalyzing = true
+        detectedNotes.removeAll()
+        
+        do {
+            try engine.start()
+            player.play()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                self.engine.stop()
+                self.isAnalyzing = false
+            }
+        } catch {
+            print("Audio engine start error: \(error.localizedDescription)")
+        }
     }
 }
