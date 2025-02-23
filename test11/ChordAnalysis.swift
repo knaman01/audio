@@ -157,7 +157,7 @@ class ChordAnalysis: ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
                 tracker.stop()
                 self.engine.stop()
-                self.detectedChord = self.identifyChord(from: self.detectedNotes)
+                
                 self.isAnalyzing = false
             }
         } catch {
@@ -180,11 +180,11 @@ class ChordAnalysis: ObservableObject {
             let note = frequencyToNoteName(freq)
             let noteWithoutOctave = String(note.prefix(while: { !$0.isNumber }))
             
-            // Increment the note count
-            noteBuffer[noteWithoutOctave, default: 0] += 1
+            // // Increment the note count
+            // noteBuffer[noteWithoutOctave, default: 0] += 1
             
             // Add to detected notes if it appears enough times
-            if noteBuffer[noteWithoutOctave, default: 0] >= 2 && !detectedNotes.contains(noteWithoutOctave) {
+            if !detectedNotes.contains(noteWithoutOctave) {
                 detectedNotes.append(noteWithoutOctave)
                 print("Detected note: \(noteWithoutOctave) (freq: \(freq)Hz, count: \(noteBuffer[noteWithoutOctave, default: 0]))")
             }
@@ -209,33 +209,5 @@ class ChordAnalysis: ObservableObject {
         // Add octave number for debugging
         let octave = (roundedNote / 12) - 1
         return "\(noteNames[noteIndex])\(octave)"  // Including octave number temporarily
-    }
-    
-    private func identifyChord(from notes: [String]) -> String {
-        print("Notes with counts:", noteBuffer)  // Debug log to see note frequencies
-        
-        // Filter out notes that don't appear frequently enough
-        let significantNotes = noteBuffer.filter { $0.value >= 5 }  // Increased threshold
-            .map { $0.key }
-        
-        print("Significant notes:", significantNotes)  // Debug log
-        
-        let knownChords: [String: (root: String, notes: Set<String>)] = [
-            "C Major": ("C", ["C", "E", "G"]),
-            "G Major": ("G", ["G", "B", "D"]),
-            "D Major": ("D", ["D", "F#", "A"]),
-            "A Minor": ("A", ["A", "C", "E"])
-        ]
-        
-        for (chord, details) in knownChords {
-            // Check if the root note is present and prominent
-            guard significantNotes.contains(details.root),
-                  details.notes.isSubset(of: Set(significantNotes)) else {
-                continue
-            }
-            return chord
-        }
-        
-        return "Unknown Chord"
     }
 }
