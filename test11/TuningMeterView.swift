@@ -63,6 +63,10 @@ struct TuningMeterView: View {
                 Text("\(abs(cents), specifier: "%.1f") cents \(cents < 0 ? "flat" : "sharp")")
                     .font(.caption)
                     .foregroundColor(.secondary)
+            } else {
+                Text("isInTune")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
     }
