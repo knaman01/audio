@@ -1,5 +1,5 @@
 //
-//  ChordAnalysis.swift
+//  NoteAnalysis.swift
 //  test11
 //
 //  Created by Naman Kalkhuria on 21/02/25.
@@ -11,7 +11,7 @@ import AVFoundation
 
 
 
-class ChordAnalysis: ObservableObject {
+class NoteAnalysis: ObservableObject {
     @Published var waveformSamples: [Float] = []
     @Published var isWaveformReady = false
 
@@ -22,8 +22,6 @@ class ChordAnalysis: ObservableObject {
     
     @Published var isAnalyzing = false
     @Published var isRecording = false
-    @Published var detectedNotes: [String] = []
-    @Published var detectedChord: String = "Press Record"
     @Published var recordedFileURL: URL?
     
     @Published var isUkulele = false
@@ -102,8 +100,6 @@ class ChordAnalysis: ObservableObject {
             
             isRecording = true
             recordedFileURL = fileURL
-            detectedNotes.removeAll()
-            detectedChord = "Recording..."
         } catch {
             print("Failed to start recording: \(error.localizedDescription)")
         }
@@ -114,10 +110,6 @@ class ChordAnalysis: ObservableObject {
         pitchTap?.stop()
         engine.stop()
         isRecording = false
-        
-        if detectedNotes.isEmpty {
-            detectedChord = "No notes detected"
-        }
         
         loadRecordedFile()
     }
@@ -168,16 +160,6 @@ class ChordAnalysis: ObservableObject {
             
             // Calculate cents difference (100 cents = 1 semitone)
             let cents = 1200 * log2(Double(freq) / closestString.1)
-            
-            // Update the detected chord text with tuning information
-            let direction = cents > 0 ? "↓ Lower" : "↑ Higher"
-            let accuracy = abs(cents)
-            
-            if accuracy < 5 {
-                detectedChord = "\(closestString.0) (In tune!)"
-            } else {
-                detectedChord = "\(closestString.0) (\(direction)) | \(String(format: "%.1f", abs(cents))) cents"
-            }
             
             print("Frequency: \(freq)Hz, Closest string: \(closestString.0), Cents off: \(cents)")
             

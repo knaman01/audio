@@ -38,16 +38,16 @@ struct WaveformView: View {
 }
 
 struct ContentView: View {
-    @StateObject private var chordAnalysis = ChordAnalysis()
+    @StateObject private var noteAnalysis = NoteAnalysis()
     
     var body: some View {
         VStack {
             HStack {
                 Image(systemName: "guitars")
                     .font(.system(size: 24))
-                    .foregroundColor(chordAnalysis.isUkulele ? .blue : .gray)
+                    .foregroundColor(noteAnalysis.isUkulele ? .blue : .gray)
                 
-                Toggle("Ukulele Mode", isOn: $chordAnalysis.isUkulele)
+                Toggle("Ukulele Mode", isOn: $noteAnalysis.isUkulele)
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
             }
             .padding()
@@ -58,41 +58,33 @@ struct ContentView: View {
             )
             .padding(.horizontal)
             
-            if chordAnalysis.isWaveformReady {
-                WaveformView(samples: chordAnalysis.waveformSamples, color: .blue)
+            if noteAnalysis.isWaveformReady {
+                WaveformView(samples: noteAnalysis.waveformSamples, color: .blue)
                     .frame(height: 100)
                     .padding()
             }
             
             TuningMeterView(
-                cents: chordAnalysis.tuningData.cents,
-                noteName: chordAnalysis.tuningData.noteName,
-                isInTune: chordAnalysis.tuningData.isInTune
+                cents: noteAnalysis.tuningData.cents,
+                noteName: noteAnalysis.tuningData.noteName,
+                isInTune: noteAnalysis.tuningData.isInTune
             )
             .padding()
             
             Button(action: {
-                if chordAnalysis.isRecording {
-                    chordAnalysis.stopRecording()
+                if noteAnalysis.isRecording {
+                    noteAnalysis.stopRecording()
                 } else {
-                    chordAnalysis.startRecording()
+                    noteAnalysis.startRecording()
                 }
             }) {
-                Text(chordAnalysis.isRecording ? "Stop Recording" : "Start Recording")
+                Text(noteAnalysis.isRecording ? "Stop Recording" : "Start Recording")
                     .padding()
-                    .background(chordAnalysis.isRecording ? Color.red : Color.blue)
+                    .background(noteAnalysis.isRecording ? Color.red : Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
             .padding()
-        }
-    }
-}
-
-struct ChordDetectorApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
         }
     }
 }
