@@ -1,6 +1,0 @@
-framework module soundpipe {
-  umbrella header "soundpipe.h"
-
-  export *
-  module * { export * }
-}

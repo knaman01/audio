@@ -1,6 +1,0 @@
-framework module CAudioKit {
-  umbrella header "CAudioKit.h"
-
-  export *
-  module * { export * }
-}
