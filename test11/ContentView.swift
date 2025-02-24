@@ -37,6 +37,8 @@ struct WaveformView: View {
     }
 }
 
+
+
 struct ContentView: View {
     @StateObject private var chordAnalysis = ChordAnalysis()
     
@@ -48,9 +50,12 @@ struct ContentView: View {
                     .padding()
             }
             
-            Text(chordAnalysis.detectedChord)
-                .font(.title)
-                .padding()
+            TuningMeterView(
+                cents: chordAnalysis.tuningData.cents,
+                noteName: chordAnalysis.tuningData.noteName,
+                isInTune: chordAnalysis.tuningData.isInTune
+            )
+            .padding()
             
             Button(action: {
                 if chordAnalysis.isRecording {
@@ -66,11 +71,6 @@ struct ContentView: View {
                     .cornerRadius(10)
             }
             .padding()
-            
-            if !chordAnalysis.detectedNotes.isEmpty {
-                Text("Detected Notes: \(chordAnalysis.detectedNotes.joined(separator: ", "))")
-                    .padding()
-            }
         }
     }
 }

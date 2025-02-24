@@ -32,6 +32,8 @@ class ChordAnalysis: ObservableObject {
     private var micMixer: Mixer?
     private var pitchTap: PitchTap?
     
+    @Published var tuningData: (cents: Double, noteName: String, isInTune: Bool) = (0, "Press Record", false)
+    
     init() {
         setupAudioSession()
         setupAudioEngine()
@@ -130,19 +132,49 @@ class ChordAnalysis: ObservableObject {
         let noiseThreshold: Float = 0.1
         
         if amplitude > noiseThreshold {
-            let note = frequencyToNoteName(freq)
-            let noteWithoutOctave = String(note.prefix(while: { !$0.isNumber }))
+            // Standard guitar frequencies (E2=82.41, A2=110, D3=146.83, G3=196, B3=246.94, E4=329.63)
+            let guitarStrings = [
+                ("E2", 82.41),
+                ("A2", 110.0),
+                ("D3", 146.83),
+                ("G3", 196.0),
+                ("B3", 246.94),
+                ("E4", 329.63)
+            ]
             
-            // Add to detected notes if it's not already there
-            if !detectedNotes.contains(noteWithoutOctave) {
-                detectedNotes.append(noteWithoutOctave)
-                
-                // Update the detected chord text
-                if !detectedNotes.isEmpty {
-                    detectedChord = "Notes: \(detectedNotes.joined(separator: ", "))"
+            // Find the closest guitar string
+            var closestString = guitarStrings[0]
+            var minDifference = abs(freq - Float(guitarStrings[0].1))
+            
+            for string in guitarStrings {
+                let difference = abs(freq - Float(string.1))
+                if difference < minDifference {
+                    minDifference = difference
+                    closestString = string
                 }
-                
-                print("Detected note: \(noteWithoutOctave) (freq: \(freq)Hz)")
+            }
+            
+            // Calculate cents difference (100 cents = 1 semitone)
+            let cents = 1200 * log2(Double(freq) / closestString.1)
+            
+            // Update the detected chord text with tuning information
+            let direction = cents > 0 ? "↓ Lower" : "↑ Higher"
+            let accuracy = abs(cents)
+            
+            if accuracy < 5 {
+                detectedChord = "\(closestString.0) (In tune!)"
+            } else {
+                detectedChord = "\(closestString.0) (\(direction)) | \(String(format: "%.1f", abs(cents))) cents"
+            }
+            
+            print("Frequency: \(freq)Hz, Closest string: \(closestString.0), Cents off: \(cents)")
+            
+            // Calculate cents difference
+            let isInTune = abs(cents) < 5
+            
+            // Update tuning data
+            DispatchQueue.main.async {
+                self.tuningData = (cents, closestString.0, isInTune)
             }
         }
     }
@@ -255,3 +287,5 @@ class ChordAnalysis: ObservableObject {
         }
     }
 }
+
+
