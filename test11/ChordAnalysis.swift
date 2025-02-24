@@ -70,6 +70,15 @@ class ChordAnalysis: ObservableObject {
     }
     
     func startRecording() {
+        pitchTap?.stop()
+        engine.stop()
+
+        // Add a small delay to ensure cleanup
+        Thread.sleep(forTimeInterval: 0.1)
+        
+        // Setup new audio engine
+        
+
         let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("recording.m4a")
         let settings: [String: Any] = [
             AVFormatIDKey: kAudioFormatMPEG4AAC,
@@ -79,12 +88,13 @@ class ChordAnalysis: ObservableObject {
         ]
         
         do {
+            print ("starting the recording")
             audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
             audioRecorder?.record()
             
             // Start real-time analysis
             try engine.start()
-            pitchTap?.start()
+            pitchTap?.start()   
             
             isRecording = true
             recordedFileURL = fileURL
@@ -117,7 +127,7 @@ class ChordAnalysis: ObservableObject {
               pitch.count >= 2 else { return }
         
         let amplitude = pitch[1]
-        let noiseThreshold: Float = 0.02
+        let noiseThreshold: Float = 0.1
         
         if amplitude > noiseThreshold {
             let note = frequencyToNoteName(freq)
@@ -144,9 +154,7 @@ class ChordAnalysis: ObservableObject {
             let audioFile = try AVAudioFile(forReading: fileURL)
             audioPlayer = AudioPlayer(file: audioFile)
             
-            // Reset the engine before setting up playback
-            engine.stop()
-            engine.output = audioPlayer
+            
             
             // Add waveform processing
             processWaveform(audioFile)
