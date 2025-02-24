@@ -26,6 +26,8 @@ class ChordAnalysis: ObservableObject {
     @Published var detectedChord: String = "Press Record"
     @Published var recordedFileURL: URL?
     
+    @Published var isUkulele = false
+    
     private var lastProcessTime: Date = Date()
     private var noteBuffer: [String: Int] = [:]  // Track note occurrences
     
@@ -132,7 +134,7 @@ class ChordAnalysis: ObservableObject {
         let noiseThreshold: Float = 0.1
         
         if amplitude > noiseThreshold {
-            // Standard guitar frequencies (E2=82.41, A2=110, D3=146.83, G3=196, B3=246.94, E4=329.63)
+            // Define both instrument tunings
             let guitarStrings = [
                 ("E2", 82.41),
                 ("A2", 110.0),
@@ -142,11 +144,21 @@ class ChordAnalysis: ObservableObject {
                 ("E4", 329.63)
             ]
             
-            // Find the closest guitar string
-            var closestString = guitarStrings[0]
-            var minDifference = abs(freq - Float(guitarStrings[0].1))
+            let ukuleleStrings = [
+                ("G4", 392.0),
+                ("C4", 261.63),
+                ("E4", 329.63),
+                ("A4", 440.0)
+            ]
             
-            for string in guitarStrings {
+            // Choose the appropriate tuning based on instrument selection
+            let instrumentStrings = isUkulele ? ukuleleStrings : guitarStrings
+            
+            // Find the closest string
+            var closestString = instrumentStrings[0]
+            var minDifference = abs(freq - Float(instrumentStrings[0].1))
+            
+            for string in instrumentStrings {
                 let difference = abs(freq - Float(string.1))
                 if difference < minDifference {
                     minDifference = difference

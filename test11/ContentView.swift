@@ -37,13 +37,27 @@ struct WaveformView: View {
     }
 }
 
-
-
 struct ContentView: View {
     @StateObject private var chordAnalysis = ChordAnalysis()
     
     var body: some View {
         VStack {
+            HStack {
+                Image(systemName: "guitars")
+                    .font(.system(size: 24))
+                    .foregroundColor(chordAnalysis.isUkulele ? .blue : .gray)
+                
+                Toggle("Ukulele Mode", isOn: $chordAnalysis.isUkulele)
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .gray.opacity(0.2), radius: 5, x: 0, y: 2)
+            )
+            .padding(.horizontal)
+            
             if chordAnalysis.isWaveformReady {
                 WaveformView(samples: chordAnalysis.waveformSamples, color: .blue)
                     .frame(height: 100)
