@@ -243,49 +243,8 @@ class ChordAnalysis: ObservableObject {
         }
     }
     
-    private func frequencyToNoteName(_ frequency: Float) -> String {
-
-        // A4 = 440Hz, which is 69 semitones above C0
-        let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        
-        // Use the formula: n = 12 * log2(f/440) + 69
-        // This gives us the MIDI note number
-        let midiNoteNumber = 12.0 * log2(Double(frequency) / 440.0) + 69.0
-        
-        // Round to nearest note
-        let roundedNote = Int(round(midiNoteNumber))
-        
-        // Get the note name (0-11)
-        let noteIndex = ((roundedNote % 12) + 12) % 12
-        
-        // Add octave number for debugging
-        let octave = (roundedNote / 12) - 1
-        return "\(noteNames[noteIndex])\(octave)"  // Including octave number temporarily
-    }
+   
     
-    func analyzeRecording() {
-        // This method can be removed or kept for analyzing recorded audio
-        // Since we're now doing real-time analysis
-        guard let player = audioPlayer else {
-            print("Audio player not initialized.")
-            return
-        }
-        
-        isAnalyzing = true
-        detectedNotes.removeAll()
-        
-        do {
-            try engine.start()
-            player.play()
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-                self.engine.stop()
-                self.isAnalyzing = false
-            }
-        } catch {
-            print("Audio engine start error: \(error.localizedDescription)")
-        }
-    }
 }
 
 
