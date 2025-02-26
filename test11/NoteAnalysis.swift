@@ -28,17 +28,19 @@ class NoteAnalysis: ObservableObject {
     @Published var isUkulele = false
     
     private var lastProcessTime: Date = Date()
-    private var noteBuffer: [String: Int] = [:]  // Track note occurrences
+    
     
     private var micMixer: Mixer?
+    private var mainMixer: Mixer?
     private var pitchTap: PitchTap?
     
     @Published var tuningData: (cents: Double, noteName: String, isInTune: Bool) = (0, "Press Record", false)
     
-    private var oscillator: Oscillator?
-    private var oscillatorMixer: Mixer?
     
     private var lastPlaybackTime: Date = Date()
+    
+    private var pluckedString: PluckedString?
+    
     
     
     init() {
@@ -56,39 +58,32 @@ class NoteAnalysis: ObservableObject {
     }
     
     private func setupAudioEngine() {
-        // Stop existing connections
         pitchTap?.stop()
         engine.stop()
-        oscillator?.stop()
         
         guard let input = engine.input else {
             print("Audio input not available")
             return
         }
         
-        // Create mixer and connect input
+        // Create and configure plucked string
+        pluckedString = PluckedString(
+            frequency: 440, // Initial frequency (A4)
+            amplitude: 0.5, // Medium volume
+            lowestFrequency: 50 // Low enough for guitar/ukulele
+        )
+        
+        // Create mixers and routing
         micMixer = Mixer(input)
-        oscillatorMixer = Mixer()
-        
-        // Create and configure oscillator
-        oscillator = Oscillator()
-        if let osc = oscillator {
-            oscillatorMixer = Mixer(osc)
-            oscillatorMixer?.volume = 0.5
-        }
-        
-        // Safely unwrap mixers before creating main mixer
-        guard let mic = micMixer, let osc = oscillatorMixer else {
-            print("Failed to create mixers")
-            return
-        }
-        
-        let mainMixer = Mixer(mic, osc)
-        engine.output = mainMixer
-        
         micMixer?.volume = 0.0
         
-        // Setup pitch tracking
+        mainMixer = Mixer(micMixer!)
+        if let stringOutput = pluckedString {
+            mainMixer?.addInput(stringOutput)
+        }
+        
+        engine.output = mainMixer
+        
         pitchTap = PitchTap(input) { pitch, amplitude in
             DispatchQueue.main.async {
                 self.processPitch([pitch[0], amplitude[0]])
@@ -192,15 +187,15 @@ class NoteAnalysis: ObservableObject {
             
             // Calculate cents difference
             let isInTune = abs(cents) < 5
-            
+
+            // Add reference note playback when in tune
             if isInTune {
-                // Replace the direct playReferenceNote call with debounced version
-                if now.timeIntervalSince(lastPlaybackTime) >= 2.0 {
+                let now = Date()
+                if now.timeIntervalSince(lastPlaybackTime) >= 1.0 {
                     playReferenceNote(frequency: closestString.1)
                     lastPlaybackTime = now
                 }
             }
-
 
             // Update tuning data
             DispatchQueue.main.async {
@@ -274,12 +269,12 @@ class NoteAnalysis: ObservableObject {
     }
     
     func playReferenceNote(frequency: Double) {
-        oscillator?.frequency = AUValue(frequency)
-        oscillator?.start()
-        
-        // Stop the note after 1 second
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.oscillator?.stop()
+        let now = Date()
+        if now.timeIntervalSince(lastPlaybackTime) >= 5.0 {
+            // Trigger the plucked string with the new frequency
+            pluckedString?.trigger(frequency: AUValue(frequency), amplitude: 0.5)
+            
+            lastPlaybackTime = now
         }
     }
     
