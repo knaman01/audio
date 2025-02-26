@@ -7,13 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		085EE0AFBE9494D833C1D722 /* Pods_test11.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859247DD0AE76C0E4AC7A6C4 /* Pods_test11.framework */; };
+		01BDC41C4F155464951479E5 /* libPods-test11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 64D964937683D8832CB8AA13 /* libPods-test11.a */; };
 		0C9828932D688DC500E221AB /* chord_sample.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0C9828922D688DC500E221AB /* chord_sample.mp4 */; };
 		0C9828952D688F1300E221AB /* wa.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0C9828942D688F1300E221AB /* wa.mp4 */; };
 		0C9828972D68905000E221AB /* am.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0C9828962D68905000E221AB /* am.mp4 */; };
 		0C983CAB2D676663003BC54D /* style_transfer.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 0C983CAA2D676663003BC54D /* style_transfer.tflite */; };
 		0C983CAC2D676663003BC54D /* style_transfer.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 0C983CAA2D676663003BC54D /* style_transfer.tflite */; };
 		0C983CAD2D676663003BC54D /* style_transfer.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 0C983CAA2D676663003BC54D /* style_transfer.tflite */; };
+		0CE29BE22D6ED467008FE311 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE29BE12D6ED467008FE311 /* AudioKit */; };
+		0CE29C0F2D6ED571008FE311 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE29C0E2D6ED571008FE311 /* AudioKitEX */; };
+		0CE29C122D6ED65E008FE311 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE29C112D6ED65E008FE311 /* SoundpipeAudioKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,7 +45,7 @@
 		0CF6F6C12D673E3C006AB9CE /* test11Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test11Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CF6F6CB2D673E3C006AB9CE /* test11UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test11UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4344177C4C74AF5E5CEDFC4C /* Pods-test11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test11.release.xcconfig"; path = "Target Support Files/Pods-test11/Pods-test11.release.xcconfig"; sourceTree = "<group>"; };
-		859247DD0AE76C0E4AC7A6C4 /* Pods_test11.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_test11.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		64D964937683D8832CB8AA13 /* libPods-test11.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-test11.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		908C4E33591D35E0EEB305B5 /* Pods-test11.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test11.debug.xcconfig"; path = "Target Support Files/Pods-test11/Pods-test11.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -69,7 +72,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				085EE0AFBE9494D833C1D722 /* Pods_test11.framework in Frameworks */,
+				0CE29C0F2D6ED571008FE311 /* AudioKitEX in Frameworks */,
+				0CE29BE22D6ED467008FE311 /* AudioKit in Frameworks */,
+				0CE29C122D6ED65E008FE311 /* SoundpipeAudioKit in Frameworks */,
+				01BDC41C4F155464951479E5 /* libPods-test11.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +99,7 @@
 		0036D5363B02FDD6FBDB8B0D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				859247DD0AE76C0E4AC7A6C4 /* Pods_test11.framework */,
+				64D964937683D8832CB8AA13 /* libPods-test11.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -239,6 +245,11 @@
 			);
 			mainGroup = 0CF6F6A62D673E3A006AB9CE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0CE29BE02D6ED467008FE311 /* XCRemoteSwiftPackageReference "AudioKit" */,
+				0CE29C0D2D6ED571008FE311 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
+				0CE29C102D6ED65E008FE311 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0CF6F6B02D673E3A006AB9CE /* Products */;
 			projectDirPath = "";
@@ -635,6 +646,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0CE29BE02D6ED467008FE311 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.4;
+			};
+		};
+		0CE29C0D2D6ED571008FE311 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitEX";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.1;
+			};
+		};
+		0CE29C102D6ED65E008FE311 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0CE29BE12D6ED467008FE311 /* AudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0CE29BE02D6ED467008FE311 /* XCRemoteSwiftPackageReference "AudioKit" */;
+			productName = AudioKit;
+		};
+		0CE29C0E2D6ED571008FE311 /* AudioKitEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0CE29C0D2D6ED571008FE311 /* XCRemoteSwiftPackageReference "AudioKitEX" */;
+			productName = AudioKitEX;
+		};
+		0CE29C112D6ED65E008FE311 /* SoundpipeAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0CE29C102D6ED65E008FE311 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */;
+			productName = SoundpipeAudioKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0CF6F6A72D673E3A006AB9CE /* Project object */;
 }

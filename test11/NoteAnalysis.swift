@@ -7,7 +7,8 @@
 import SwiftUI
 import AudioKit
 import AVFoundation
-
+import AudioKitEX
+import SoundpipeAudioKit 
 
 
 
@@ -34,6 +35,12 @@ class NoteAnalysis: ObservableObject {
     
     @Published var tuningData: (cents: Double, noteName: String, isInTune: Bool) = (0, "Press Record", false)
     
+    private var oscillator: Oscillator?
+    private var oscillatorMixer: Mixer?
+    
+    private var lastPlaybackTime: Date = Date()
+    
+    
     init() {
         setupAudioSession()
         setupAudioEngine()
@@ -52,6 +59,7 @@ class NoteAnalysis: ObservableObject {
         // Stop existing connections
         pitchTap?.stop()
         engine.stop()
+        oscillator?.stop()
         
         guard let input = engine.input else {
             print("Audio input not available")
@@ -60,7 +68,24 @@ class NoteAnalysis: ObservableObject {
         
         // Create mixer and connect input
         micMixer = Mixer(input)
-        engine.output = micMixer
+        oscillatorMixer = Mixer()
+        
+        // Create and configure oscillator
+        oscillator = Oscillator()
+        if let osc = oscillator {
+            oscillatorMixer = Mixer(osc)
+            oscillatorMixer?.volume = 0.5
+        }
+        
+        // Safely unwrap mixers before creating main mixer
+        guard let mic = micMixer, let osc = oscillatorMixer else {
+            print("Failed to create mixers")
+            return
+        }
+        
+        let mainMixer = Mixer(mic, osc)
+        engine.output = mainMixer
+        
         micMixer?.volume = 0.0
         
         // Setup pitch tracking
@@ -158,6 +183,8 @@ class NoteAnalysis: ObservableObject {
                 }
             }
             
+            
+            
             // Calculate cents difference (100 cents = 1 semitone)
             let cents = 1200 * log2(Double(freq) / closestString.1)
             
@@ -166,6 +193,15 @@ class NoteAnalysis: ObservableObject {
             // Calculate cents difference
             let isInTune = abs(cents) < 5
             
+            if isInTune {
+                // Replace the direct playReferenceNote call with debounced version
+                if now.timeIntervalSince(lastPlaybackTime) >= 2.0 {
+                    playReferenceNote(frequency: closestString.1)
+                    lastPlaybackTime = now
+                }
+            }
+
+
             // Update tuning data
             DispatchQueue.main.async {
                 self.tuningData = (cents, closestString.0, isInTune)
@@ -237,7 +273,15 @@ class NoteAnalysis: ObservableObject {
         }
     }
     
-   
+    func playReferenceNote(frequency: Double) {
+        oscillator?.frequency = AUValue(frequency)
+        oscillator?.start()
+        
+        // Stop the note after 1 second
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.oscillator?.stop()
+        }
+    }
     
 }
 
