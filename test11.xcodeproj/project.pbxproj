@@ -7,13 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		01BDC41C4F155464951479E5 /* libPods-test11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 64D964937683D8832CB8AA13 /* libPods-test11.a */; };
 		0C9828932D688DC500E221AB /* chord_sample.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0C9828922D688DC500E221AB /* chord_sample.mp4 */; };
 		0C9828952D688F1300E221AB /* wa.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0C9828942D688F1300E221AB /* wa.mp4 */; };
 		0C9828972D68905000E221AB /* am.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0C9828962D68905000E221AB /* am.mp4 */; };
-		0C983CAB2D676663003BC54D /* style_transfer.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 0C983CAA2D676663003BC54D /* style_transfer.tflite */; };
-		0C983CAC2D676663003BC54D /* style_transfer.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 0C983CAA2D676663003BC54D /* style_transfer.tflite */; };
-		0C983CAD2D676663003BC54D /* style_transfer.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 0C983CAA2D676663003BC54D /* style_transfer.tflite */; };
 		0CE29BE22D6ED467008FE311 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE29BE12D6ED467008FE311 /* AudioKit */; };
 		0CE29C0F2D6ED571008FE311 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE29C0E2D6ED571008FE311 /* AudioKitEX */; };
 		0CE29C122D6ED65E008FE311 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE29C112D6ED65E008FE311 /* SoundpipeAudioKit */; };
@@ -40,11 +36,11 @@
 		0C9828922D688DC500E221AB /* chord_sample.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = chord_sample.mp4; sourceTree = "<group>"; };
 		0C9828942D688F1300E221AB /* wa.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = wa.mp4; sourceTree = "<group>"; };
 		0C9828962D68905000E221AB /* am.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = am.mp4; sourceTree = "<group>"; };
-		0C983CAA2D676663003BC54D /* style_transfer.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = style_transfer.tflite; sourceTree = "<group>"; };
 		0CF6F6AF2D673E3A006AB9CE /* test11.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test11.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CF6F6C12D673E3C006AB9CE /* test11Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test11Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CF6F6CB2D673E3C006AB9CE /* test11UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test11UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4344177C4C74AF5E5CEDFC4C /* Pods-test11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test11.release.xcconfig"; path = "Target Support Files/Pods-test11/Pods-test11.release.xcconfig"; sourceTree = "<group>"; };
+		908C4E33591D35E0EEB305B5 /* Pods-test11.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test11.debug.xcconfig"; path = "Target Support Files/Pods-test11/Pods-test11.debug.xcconfig"; sourceTree = "<group>"; };
 		64D964937683D8832CB8AA13 /* libPods-test11.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-test11.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		908C4E33591D35E0EEB305B5 /* Pods-test11.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test11.debug.xcconfig"; path = "Target Support Files/Pods-test11/Pods-test11.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,7 +71,6 @@
 				0CE29C0F2D6ED571008FE311 /* AudioKitEX in Frameworks */,
 				0CE29BE22D6ED467008FE311 /* AudioKit in Frameworks */,
 				0CE29C122D6ED65E008FE311 /* SoundpipeAudioKit in Frameworks */,
-				01BDC41C4F155464951479E5 /* libPods-test11.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,23 +99,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		0C983CA92D67663B003BC54D /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				0C983CAA2D676663003BC54D /* style_transfer.tflite */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		0CF6F6A62D673E3A006AB9CE = {
 			isa = PBXGroup;
 			children = (
-				0C983CA92D67663B003BC54D /* Models */,
 				0CF6F6B12D673E3A006AB9CE /* test11 */,
 				0CF6F6C42D673E3C006AB9CE /* test11Tests */,
 				0CF6F6CE2D673E3C006AB9CE /* test11UITests */,
 				0CF6F6B02D673E3A006AB9CE /* Products */,
-				946BF97BE82450E3703BA66D /* Pods */,
 				0036D5363B02FDD6FBDB8B0D /* Frameworks */,
 				0C9828922D688DC500E221AB /* chord_sample.mp4 */,
 				0C9828942D688F1300E221AB /* wa.mp4 */,
@@ -154,7 +139,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0CF6F6D52D673E3C006AB9CE /* Build configuration list for PBXNativeTarget "test11" */;
 			buildPhases = (
-				02CC20BEB31BD299E53266EB /* [CP] Check Pods Manifest.lock */,
 				0CF6F6AB2D673E3A006AB9CE /* Sources */,
 				0CF6F6AC2D673E3A006AB9CE /* Frameworks */,
 				0CF6F6AD2D673E3A006AB9CE /* Resources */,
@@ -270,7 +254,6 @@
 				0C9828952D688F1300E221AB /* wa.mp4 in Resources */,
 				0C9828932D688DC500E221AB /* chord_sample.mp4 in Resources */,
 				0C9828972D68905000E221AB /* am.mp4 in Resources */,
-				0C983CAC2D676663003BC54D /* style_transfer.tflite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,7 +261,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C983CAB2D676663003BC54D /* style_transfer.tflite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,7 +268,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C983CAD2D676663003BC54D /* style_transfer.tflite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,7 +457,6 @@
 		};
 		0CF6F6D62D673E3C006AB9CE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 908C4E33591D35E0EEB305B5 /* Pods-test11.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -508,7 +488,6 @@
 		};
 		0CF6F6D72D673E3C006AB9CE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4344177C4C74AF5E5CEDFC4C /* Pods-test11.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
